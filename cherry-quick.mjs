@@ -4,9 +4,10 @@ import { parseArgs } from 'node:util'
 import { execSync } from 'child_process'
 import clipboardy from 'clipboardy'
 import Enquirer from 'enquirer'
-import chalk from 'chalk'
+import c from 'ansi-colors'
 
-const DEFAULT_FROM_BRANCH = process.env.CHERRY_QUICK_DEFAULT_FROM_BRANCHES || 'dev'
+const DEFAULT_FROM_BRANCH = process.env.CHERRY_QUICK_DEFAULT_FROM_BRANCH || 'dev'
+const DEFAULT_INCLUDE_BRANCH = process.env.CHERRY_QUICK_DEFAULT_INCLUDE_BRANCH
 const DEFAULT_TO_BRANCH = process.env.CHERRY_QUICK_DEFAULT_TO_BRANCH || 'master'
 const DEFAULT_ROWS = process.env.CHERRY_QUICK_DEFAULT_ROWS || 20
 
@@ -33,7 +34,7 @@ if (values.help) {
     'Arguments:',
     `  --from, -f: branch to pick commits from (default: ${DEFAULT_FROM_BRANCH})`,
     `  --to, -t: name of the target branch (default: ${DEFAULT_TO_BRANCH})`,
-    '  --include, -i: mark commits that are already merged to this branch (optional)',
+    `  --include, -i: mark commits that are already merged to this branch (${DEFAULT_INCLUDE_BRANCH ? `default: ${DEFAULT_INCLUDE_BRANCH}` : 'optional'})`,
     '  --branch, -b: name of a cherry-pick branch (optional)',
     '',
     'Usage:',
@@ -57,7 +58,7 @@ if (values.help) {
 
 const fromBranch = values.from || DEFAULT_FROM_BRANCH
 const toBranch = values.to || DEFAULT_TO_BRANCH
-const includeBranch = values.include
+const includeBranch = values.include || DEFAULT_INCLUDE_BRANCH
 const cherryPickBranch = values.branch || undefined
 const rows = DEFAULT_ROWS
 
@@ -73,6 +74,11 @@ const fromBranchCherryPickableCommits = fromBranchCherryPickableFullHashes
     return commit
   })
   .reverse()
+
+if (fromBranchCherryPickableCommits.length === 0) {
+  console.log('No commits to pick from')
+  process.exit(0)
+}
 
 // @ts-ignore
 const cherryPickCommitsFullHashes = await new Enquirer.AutoComplete({
@@ -97,12 +103,12 @@ const cherryPickCommitsFullHashes = await new Enquirer.AutoComplete({
       const message = [
         includeBranch
           ? includeBranchCherryPickableFullHashes.includes(commit.fullHash)
-            ? chalk.dim(includeBranch)
-            : chalk.green(includeBranch)
+            ? c.dim(includeBranch)
+            : c.green(includeBranch)
           : undefined,
-        chalk.dim(commit.hash),
+        c.dim(commit.hash),
         truncate(commit.message, 80),
-        chalk.dim(truncate(commit.author, 20)),
+        c.dim(truncate(commit.author, 20)),
       ].filter(Boolean).join(' ')
 
       const prevCommitDate = commits[i - 1] ? new Date(commits[i - 1].timestamp) : undefined
@@ -131,7 +137,7 @@ const cherryPickCommits = cherryPickCommitsFullHashes
   .sort((a, b) => a.timestamp - b.timestamp)
 
 if (cherryPickCommits.length === 0) {
-  console.log('No commits were selected')
+  console.log('No commits were picked')
   process.exit(0)
 }
 
