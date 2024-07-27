@@ -1,0 +1,25 @@
+{
+  "name": "cherry-quick",
+  "version": "0.1.0",
+  "description": "Quickly select commits to cherry-pick",
+  "bin": "./cherry-quick.mjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitaly-rudenko/cherry-quick.git"
+  },
+  "keywords": [
+    "git",
+    "cli"
+  ],
+  "author": "Vitaly Rudenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vitaly-rudenko/cherry-quick/issues"
+  },
+  "homepage": "https://github.com/vitaly-rudenko/cherry-quick#readme",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "clipboardy": "^4.0.0",
+    "enquirer": "^2.4.1"
+  }
+}
