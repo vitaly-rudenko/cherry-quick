@@ -134,7 +134,7 @@ const cherryPickCommitsFullHashes = await new Enquirer.AutoComplete({
 
 const cherryPickCommits = cherryPickCommitsFullHashes
   .map((fullHash) => fromBranchCherryPickableCommits.find(c => c.fullHash === fullHash))
-  .sort((a, b) => a.timestamp - b.timestamp)
+  .reverse() // Commits have to be applied chronologically, and UI shows in the opposite order
 
 if (cherryPickCommits.length === 0) {
   console.log('No commits were picked')
