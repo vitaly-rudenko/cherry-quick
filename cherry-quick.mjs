@@ -90,7 +90,7 @@ const cherryPickCommitsFullHashes = await new Enquirer.AutoComplete({
     return choices
       .filter((choice) => {
         if (choice.role === 'separator') return true
-        return choice.query.includes(typed)
+        return choice.query.includes(typed.toLowerCase())
       })
       .filter((choice, i, choices) => {
         if (choice.role !== 'separator') return true
