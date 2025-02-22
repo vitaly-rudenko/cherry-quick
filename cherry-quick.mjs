@@ -66,6 +66,7 @@ const fromBranchCherryPickableFullHashes = getCherryPickableFullHashes(fromBranc
 const includeBranchCherryPickableFullHashes = includeBranch ? getCherryPickableFullHashes(fromBranch, includeBranch) : []
 
 const fromBranchCommits = getLatestCommits(fromBranch, toBranch)
+const toBranchCommits = getLatestCommits(toBranch, fromBranch)
 
 const fromBranchCherryPickableCommits = fromBranchCherryPickableFullHashes
   .map(fullHash => {
@@ -84,6 +85,10 @@ if (fromBranchCherryPickableCommits.length === 0) {
 const cherryPickCommitsFullHashes = await new Enquirer.AutoComplete({
   name: 'commits',
   message: 'Select commits to cherry-pick',
+  footer: () => [
+    `Press ${c.bold('[Space bar]')} to pick a commit. ${c.bold('[Enter]')} to confirm. ${c.bold('[Ctrl+C]')} to cancel.`,
+  c.italic('If commit is crossed out, it means that a commit with the same message exists on the target branch.'),
+  ].join('\n'),
   multiple: true,
   rows,
   suggest: (typed, choices) => {
@@ -100,13 +105,15 @@ const cherryPickCommitsFullHashes = await new Enquirer.AutoComplete({
   },
   choices: [
     ...fromBranchCherryPickableCommits.flatMap((commit, i, commits) => {
+      const toBatchHasSameCommitMessage = toBranchCommits.some(c => c.message === commit.message)
+
       const message = [
         includeBranch
           ? includeBranchCherryPickableFullHashes.includes(commit.fullHash)
             ? c.dim(includeBranch)
             : c.green(includeBranch)
           : undefined,
-        c.dim(commit.hash),
+        c.dim(toBatchHasSameCommitMessage ? c.strikethrough(commit.hash) : commit.hash),
         truncate(commit.message, 80),
         c.dim(truncate(commit.author, 20)),
       ].filter(Boolean).join(' ')
