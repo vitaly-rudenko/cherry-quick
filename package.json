@@ -1,6 +1,6 @@
 {
   "name": "cherry-quick",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Quickly select commits to cherry-pick",
   "bin": "./cherry-quick.mjs",
   "repository": {
