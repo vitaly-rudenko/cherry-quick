@@ -150,7 +150,7 @@ if (cherryPickCommits.length === 0) {
 
 const command = [
   ...cherryPickBranch ? [
-    `git switch -c ${cherryPickBranch} origin/${toBranch}`,
+    `git switch -c ${cherryPickBranch} --no-track origin/${toBranch}`,
   ] : [],
   ...cherryPickCommits.map(c => `git cherry-pick ${c.fullHash}`),
   ...cherryPickBranch ? [
